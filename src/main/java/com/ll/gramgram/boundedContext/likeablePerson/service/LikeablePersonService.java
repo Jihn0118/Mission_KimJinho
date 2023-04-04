@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +48,15 @@ public class LikeablePersonService {
 
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
+    }
+
+    public Optional<LikeablePerson> getLikeablePerson(Long likeableId){
+        return this.likeablePersonRepository.findById(likeableId);
+    }
+
+    // 삭제하면 list에 바로 반영되도록 @Transactional 어노테이션을 추가
+    @Transactional
+    public void delete(LikeablePerson likeablePerson){
+        this.likeablePersonRepository.delete(likeablePerson);
     }
 }
