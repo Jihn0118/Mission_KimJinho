@@ -66,6 +66,7 @@ public class LikeablePersonController {
         return "usr/likeablePerson/list";
     }
 
+    // 로그인 해야만 가능
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String deleteLikeablePerson(@PathVariable("id") Long id){
