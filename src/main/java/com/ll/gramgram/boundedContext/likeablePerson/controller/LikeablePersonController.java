@@ -66,18 +66,20 @@ public class LikeablePersonController {
         return "usr/likeablePerson/list";
     }
 
+    // URL로 전달받은 id값을 사용하여 LikeablePerson 데이터를 조회한 후
+    // 로그인한 사용자와 인스타멤버가 동일하지 않다면 삭제권한 없다.
+    // 실패 했을 때 rq.historyback() 써라.
     // 로그인 해야만 가능
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String deleteLikeablePerson(@PathVariable("id") Long id){
-        Optional<LikeablePerson> likeablePerson = this.likeablePersonService.getLikeablePerson(id);
+        Optional<LikeablePerson> optionalLikeablePerson = this.likeablePersonService.getLikeablePerson(id);
+        RsData<LikeablePerson> deleteRsData = this.likeablePersonService.delete(rq.getMember(), optionalLikeablePerson);
 
-        // URL로 전달받은 id값을 사용하여 LikeablePerson 데이터를 조회한 후
-        // 로그인한 사용자와 인스타멤버가 동일하지 않다면 삭제권한 없다.
-        if(!likeablePerson.get().getFromInstaMember().equals(rq.getMember().getInstaMember())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,  "삭제권한이 없습니다.");
+        if(optionalLikeablePerson.isEmpty()){
+            return rq.historyBack("삭제할 호감이 없습니다.");
         }
-        this.likeablePersonService.delete(likeablePerson.get());
-        return rq.redirectWithMsg("/likeablePerson/list", String.format("%s님께 보낸 호감이 삭제되었습니다.", likeablePerson.get().getToInstaMemberUsername()));
+
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData);
     }
 }
