@@ -59,7 +59,7 @@ insta_member_id = NULL;
 - [x] MariaDB 세팅
 - [x] 시크릿 키(Kakao API KEY, Google API KEY, MariaDB 접속) 숨기기
 - [x] 필수 미션
-- [ ] 선택 미션
+- [x] 선택 미션
 
 ### 1주차 미션 요약
 
@@ -90,6 +90,16 @@ insta_member_id = NULL;
     4. 결과물2
     ![img_1.png](1Week_img_2.png)
 
-**[특이사항]**
-아쉬웠던 점
-- 베이스 코드를 이해하는데 시간이 오래 걸려서 선택 미션을 할 시간이 부족했다.
+- 선택 미션(구글 로그인)
+  - Google Cloud Platform에서 API KEY 받아서 application.yml에 코드 추가 프로젝트 생성
+    1. GCP에서 새 프로젝트 생성
+    2. API 및 서비스 - 사용자 인증 정보에서 사용자 인증 정보 만들기(OAuth 클라이언트 ID)
+    3. scope 업데이트, redirect URL 입력
+    4. OAuth 클라이언트 ID, Secret 복사
+    5. application.yml에 추가
+    
+
+**[리팩토링]**
+피어리뷰를 통해 "호감 삭제 기능에서 너무 컨트롤러에서 많은 것들을 처리한다. 이것을 서비스와 나누고 복잡한 로직은 서비스에 두는 것이 좋다." 라는 피드백을 받아서 
+컨트롤러와 서비스에 로직을 나누어서 리팩토링을 진행했다.
+그리고 Rq 클래스는 컨트롤러에서만 다루는 것이 좋다.
