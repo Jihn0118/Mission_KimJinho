@@ -1,13 +1,13 @@
 DROP
-DATABASE IF EXISTS gram__dev;
+DATABASE IF EXISTS gram_dev;
 CREATE
-DATABASE gram__dev;
+DATABASE gram_dev;
 USE
-gram__dev;
+gram_dev;
 
 DROP
-DATABASE IF EXISTS gram__test;
+DATABASE IF EXISTS gram_test;
 CREATE
-DATABASE gram__test;
+DATABASE gram_test;
 USE
-gram__test;
+gram_test;

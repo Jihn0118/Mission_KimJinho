@@ -9,13 +9,19 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/likeablePerson")
@@ -58,5 +64,22 @@ public class LikeablePersonController {
         }
 
         return "usr/likeablePerson/list";
+    }
+
+    // URL로 전달받은 id값을 사용하여 LikeablePerson 데이터를 조회한 후
+    // 로그인한 사용자와 인스타멤버가 동일하지 않다면 삭제권한 없다.
+    // 실패 했을 때 rq.historyback() 써라.
+    // 로그인 해야만 가능
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/delete/{id}")
+    public String deleteLikeablePerson(@PathVariable("id") Long id){
+        Optional<LikeablePerson> optionalLikeablePerson = this.likeablePersonService.getLikeablePerson(id);
+        RsData<LikeablePerson> deleteRsData = this.likeablePersonService.delete(rq.getMember(), optionalLikeablePerson);
+
+        if(optionalLikeablePerson.isEmpty()){
+            return rq.historyBack("삭제할 호감이 없습니다.");
+        }
+
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData);
     }
 }
