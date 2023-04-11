@@ -35,6 +35,17 @@ public class NotProd {
 
             likeablePersonService.like(memberUser3, "insta_user4", 1);
             likeablePersonService.like(memberUser3, "insta_user100", 2);
+
+            // 내 테스트 데이터 추가
+            instaMemberService.connect(memberUser6ByGoogle, "김진호테스트", "M");
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user100", 1);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user101", 2);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user102", 3);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user103", 1);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user104", 2);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user105", 3);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user106", 1);
+            likeablePersonService.like(memberUser6ByGoogle, "insta_user107", 2);
         };
     }
 }
