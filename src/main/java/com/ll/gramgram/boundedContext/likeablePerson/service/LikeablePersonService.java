@@ -30,8 +30,38 @@ public class LikeablePersonService {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
         }
 
+        // 필수미션 케이스5
+        if (member.getInstaMember().getFromLikeablePeople().size() >= 10){
+            return RsData.of("F-4", "10명까지만 호감 상대를 등록할 수 있습니다.");
+        }
+
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
+
+
+        // LikeablePerson 테이블에서 나의 인스타 아이디와
+        // 내가 호감을 보내려고 하는 상대방의 인스타 아이디에 대한 LikeablePerson 리스트를 받아옴
+        List<LikeablePerson> likeablePersonList = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(fromInstaMember.getId(), toInstaMember.getId());
+
+        // 필수미션 케이스4: 중복으로 호감표시를 할 때
+        if (!likeablePersonList.isEmpty()){
+            // 필수 미션 케이스6
+            LikeablePerson likeablePerson = likeablePersonList.get(0);
+
+            // 기존의 호감 사유 이름
+            String existingAttractiveName = likeablePerson.getAttractiveTypeDisplayName();
+
+            // 기존의 사유와 다른 사유로 호감을 표시할 때
+            if (likeablePerson.getAttractiveTypeCode() != attractiveTypeCode){
+                // 호감 사유를 업데이트함
+                updateAttractiveTypeCode(likeablePersonList.get(0), attractiveTypeCode);
+
+                return RsData.of("S-2", String.format("%s에 대한 호감 사유를 %s에서 %s(으)로 변경합니다.",
+                        likeablePerson.getToInstaMemberUsername(), existingAttractiveName,
+                        likeablePersonList.get(0).getAttractiveTypeDisplayName()));
+            }
+            return RsData.of("F-3", String.format("%s님에게 중복으로 호감을 표시할 수 없습니다.", username));
+        }
 
         LikeablePerson likeablePerson = LikeablePerson
                 .builder()
@@ -70,6 +100,13 @@ public class LikeablePersonService {
 
         this.likeablePersonRepository.delete(optionalLikeablePerson.get());
 
-        return RsData.of("S-1", String.format("%s님께 보낸 호감이 삭제되었습니다.", optionalLikeablePerson.get().getToInstaMemberUsername()));
+        return RsData.of("S-1", "%s님께 보낸 호감이 삭제되었습니다.".formatted(optionalLikeablePerson.get().getToInstaMemberUsername()));
+    }
+    // 기존 호감 표시에서 사유만 수정된다.
+    @Transactional
+    public void updateAttractiveTypeCode(LikeablePerson likeablePerson, Integer attractivTypeCode) {
+        likeablePerson.setAttractiveTypeCode(attractivTypeCode);
+        likeablePersonRepository.save(likeablePerson);
     }
 }
+
