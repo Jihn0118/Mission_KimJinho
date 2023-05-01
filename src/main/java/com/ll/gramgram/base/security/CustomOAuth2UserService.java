@@ -1,9 +1,15 @@
 package com.ll.gramgram.base.security;
 
+import com.ll.gramgram.base.rq.Rq;
+import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -12,6 +18,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,25 +29,45 @@ import java.util.Map;
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final MemberService memberService;
+    private final InstaMemberService instaMemberService;
+    private final Rq rq;
 
-    // 소셜 로그인이 성공할 때 마다 이 함수가 실행된다.
+    // 카카오톡 로그인이 성공할 때 마다 이 함수가 실행된다.
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
-
-        String oauthId = oAuth2User.getName();
-
         String providerTypeCode = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
 
-        String username = providerTypeCode + "__%s".formatted(oauthId);
+        if (providerTypeCode.equals("INSTAGRAM")) {
+            if (rq.isLogout()) {
+                throw new OAuth2AuthenticationException("로그인 후 이용해주세요.");
+            }
 
-        // 네이버 소셜 로그인의 경우 id의 value만 가져오고 싶을 때, attributes의 response안에 담겨 있기 때문에 .get("response")로 꺼내준다.
-        if (providerTypeCode.equals("NAVER")){
-            Map<String, Object> attributesResponse = (Map<String, Object>) oAuth2User.getAttributes().get("response");
-            String naverId = "NAVER__" + attributesResponse.get("id").toString();
-            username = naverId;
+            String userInfoUri = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
+            userInfoUri = userInfoUri.replace("{access-token}", userRequest.getAccessToken().getTokenValue());
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<String> entity = new HttpEntity<>(new HttpHeaders());
+            ResponseEntity<Map> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, entity, Map.class);
+
+            Map<String, String> userAttributes = response.getBody();
+
+            String gender = rq.getSessionAttr("connectByApi__gender", "W");
+            rq.removeSessionAttr("connectByApi__gender");
+
+            instaMemberService.connect(rq.getMember(), gender, userAttributes.get("id"), userAttributes.get("username"), userRequest.getAccessToken().getTokenValue());
+
+            Member member = rq.getMember();
+            return new CustomOAuth2User(member.getUsername(), member.getPassword(), member.getGrantedAuthorities());
         }
+
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+
+        String oauthId = switch (providerTypeCode) {
+            case "NAVER" -> ((Map<String, String>) oAuth2User.getAttributes().get("response")).get("id");
+            default -> oAuth2User.getName();
+        };
+
+        String username = providerTypeCode + "__%s".formatted(oauthId);
 
         Member member = memberService.whenSocialLogin(providerTypeCode, username).getData();
 
@@ -49,6 +76,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 }
 
 class CustomOAuth2User extends User implements OAuth2User {
+
     public CustomOAuth2User(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
     }
