@@ -15,6 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,6 +88,7 @@ public class LikeablePersonService {
     }
 
     public RsData canCancel(Member actor, LikeablePerson likeablePerson) {
+
         if (likeablePerson == null) return RsData.of("F-1", "이미 삭제되었습니다.");
 
         // 수행자의 인스타계정 번호
@@ -95,6 +98,10 @@ public class LikeablePersonService {
 
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
+
+        if (likeablePerson.getModifyUnlockDate().isBefore(LocalDateTime.now())) {
+            RsData.of("F-3", "이 호감 표시 건은 3시간 쿨타임이 지나지 않아서 취소할 수 없습니다.");
+        }
 
         return RsData.of("S-1", "삭제가능합니다.");
     }
@@ -199,6 +206,7 @@ public class LikeablePersonService {
     }
 
     public RsData canModifyLike(Member actor, LikeablePerson likeablePerson) {
+
         if (!actor.hasConnectedInstaMember()) {
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
         }
@@ -209,6 +217,9 @@ public class LikeablePersonService {
             return RsData.of("F-2", "해당 호감표시를 취소할 권한이 없습니다.");
         }
 
+        if (likeablePerson.getModifyUnlockDate().isBefore(LocalDateTime.now())) {
+            RsData.of("F-3", "이 호감 표시 건은 3시간 쿨타임이 지나지 않아서 호감 사유를 변경할 수 없습니다.");
+        }
 
         return RsData.of("S-1", "호감표시취소가 가능합니다.");
     }
