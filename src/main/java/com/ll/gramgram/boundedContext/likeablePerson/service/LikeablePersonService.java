@@ -100,7 +100,7 @@ public class LikeablePersonService {
             return RsData.of("F-2", "권한이 없습니다.");
 
         if (likeablePerson.getModifyUnlockDate().isBefore(LocalDateTime.now())) {
-            RsData.of("F-3", "이 호감 표시 건은 3시간 쿨타임이 지나지 않아서 취소할 수 없습니다.");
+            RsData.of("F-3", "이 호감 표시 건은 3시간이 지나지 않아서 취소할 수 없습니다.");
         }
 
         return RsData.of("S-1", "삭제가능합니다.");
@@ -218,7 +218,7 @@ public class LikeablePersonService {
         }
 
         if (likeablePerson.getModifyUnlockDate().isBefore(LocalDateTime.now())) {
-            RsData.of("F-3", "이 호감 표시 건은 3시간 쿨타임이 지나지 않아서 호감 사유를 변경할 수 없습니다.");
+            RsData.of("F-3", "이 호감 표시 건은 3시간이 지나지 않아서 호감 사유를 변경할 수 없습니다.");
         }
 
         return RsData.of("S-1", "호감표시취소가 가능합니다.");
