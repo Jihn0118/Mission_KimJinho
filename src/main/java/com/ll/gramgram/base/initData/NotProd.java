@@ -46,16 +46,19 @@ public class NotProd {
                 Member memberUser3 = memberService.join("user3", "1234").getData();
                 Member memberUser4 = memberService.join("user4", "1234").getData();
                 Member memberUser5 = memberService.join("user5", "1234").getData();
+                Member memberUser6 = memberService.join("user6", "1234").getData();
 
                 Member memberUser5ByKakao = memberService.whenSocialLogin("KAKAO", "KAKAO__2733159143").getData();
                 Member memberUser6ByGoogle = memberService.whenSocialLogin("GOOGLE", "GOOGLE__116604773536495149101").getData();
                 Member memberUser7ByNaver = memberService.whenSocialLogin("Naver", "NAVER__UIHEkW17n96q-FiIFLMz4dNXf2FBZZRqb_B-ir1WJSk").getData();
                 Member memberUser9ByFacebook = memberService.whenSocialLogin("FACEBOOK", "FACEBOOK__115350688211921").getData();
 
+                instaMemberService.connect(memberUser1, "insta_user1", "W");
                 instaMemberService.connect(memberUser2, "insta_user2", "M");
                 instaMemberService.connect(memberUser3, "insta_user3", "W");
                 instaMemberService.connect(memberUser4, "insta_user4", "M");
                 instaMemberService.connect(memberUser5, "insta_user5", "W");
+                instaMemberService.connect(memberUser6, "insta_user6", "M");
                 instaMemberService.connect(memberUser9ByFacebook, "M", "6038188069606505", "marill228",
                         "IGQVJWY2Y3RHZApdWh2cUdTWW9kczZAEbk9YeEJrWk1ZAZAXRMelNLeUZAhWUQyV05CM0dabTVZAek5JZAGlzd3JkVm5WNWtfZAlk1eDllQmUwUzkzTG9XaXFxTk5ETzRLNWh4UDBxNHltZAnZAZAU21ILU43UDN4OEZAMVzZA2MV9OR2VN");
 
@@ -66,6 +69,14 @@ public class NotProd {
                 Ut.reflection.setFieldValue(likeablePersonToinstaUser100, "modifyUnlockDate", LocalDateTime.now().minusSeconds(1));
 
                 LikeablePerson likeablePersonToInstaUserAbcd = likeablePersonService.like(memberUser3, "insta_user_abcd", 2).getData();
+
+                // 필터링 테스트를 위한 테스트 데이터 생성
+                LikeablePerson likeablePersonToMy1 = likeablePersonService.like(memberUser1, "marill228", 1).getData();
+                LikeablePerson likeablePersonToMy2 = likeablePersonService.like(memberUser2, "marill228", 2).getData();
+                LikeablePerson likeablePersonToMy3 = likeablePersonService.like(memberUser3, "marill228", 3).getData();
+                LikeablePerson likeablePersonToMy4 = likeablePersonService.like(memberUser4, "marill228", 1).getData();
+                LikeablePerson likeablePersonToMy5 = likeablePersonService.like(memberUser5, "marill228", 2).getData();
+                LikeablePerson likeablePersonToMy6 = likeablePersonService.like(memberUser6, "marill228", 3).getData();
             }
         };
     }
