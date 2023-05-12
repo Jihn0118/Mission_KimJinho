@@ -70,6 +70,24 @@ public class NotProd {
 
                 LikeablePerson likeablePersonToInstaUserAbcd = likeablePersonService.like(memberUser3, "insta_user_abcd", 2).getData();
 
+                // 정렬 테스트를 위한 테스트 데이터 생성
+                likeablePersonService.like(memberUser2, "insta_user4", 2).getData();
+                likeablePersonService.like(memberUser5, "insta_user4", 3).getData();
+                likeablePersonService.like(memberUser5ByKakao, "insta_user4", 2).getData();
+                likeablePersonService.like(memberUser6ByGoogle, "insta_user4", 1).getData();
+                likeablePersonService.like(memberUser7ByNaver, "insta_user4", 2).getData();
+                likeablePersonService.like(memberUser9ByFacebook, "insta_user4", 3).getData();
+                likeablePersonService.like(memberUser2, "insta_user6", 2).getData();
+                likeablePersonService.like(memberUser3, "insta_user6", 3).getData();
+                likeablePersonService.like(memberUser5ByKakao, "insta_user6", 2).getData();
+                likeablePersonService.like(memberUser6ByGoogle, "insta_user6", 1).getData();
+                likeablePersonService.like(memberUser2, "insta_user7", 2).getData();
+                likeablePersonService.like(memberUser3, "insta_user7", 3).getData();
+                likeablePersonService.like(memberUser5ByKakao, "insta_user7", 2).getData();
+                likeablePersonService.like(memberUser2, "insta_user8", 2).getData();
+                likeablePersonService.like(memberUser3, "insta_user8", 3).getData();
+                likeablePersonService.like(memberUser2, "insta_user9", 2).getData();
+
                 // 필터링 테스트를 위한 테스트 데이터 생성
                 LikeablePerson likeablePersonToMy1 = likeablePersonService.like(memberUser1, "marill228", 1).getData();
                 LikeablePerson likeablePersonToMy2 = likeablePersonService.like(memberUser2, "marill228", 2).getData();
