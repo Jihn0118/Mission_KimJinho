@@ -34,4 +34,4 @@ logging:
     org.hibernate.orm.jdbc.extract: INFO
 custom:
   site:
-    baseUrl: www.codelike.jinos.site
+    baseUrl: https://www.codelike.jinos.site

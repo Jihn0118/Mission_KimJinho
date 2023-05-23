@@ -15,9 +15,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -218,5 +221,48 @@ public class LikeablePersonService {
 
 
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
+    }
+    public List<LikeablePerson> findByToInstaMember(InstaMember instaMember, String gender, int attractiveTypeCode, int sortCode){
+        Stream<LikeablePerson> likeablePeopleStream = instaMember.getToLikeablePeople().stream();
+
+        // 성별 필터링
+        if(!gender.isEmpty()){
+            likeablePeopleStream = likeablePeopleStream.filter(item -> item.getFromInstaMember().getGender().equals(gender));
+        }
+
+        // 호감 사유 필터링
+        if(attractiveTypeCode != 0){
+            likeablePeopleStream = likeablePeopleStream.filter(item -> item.getAttractiveTypeCode() == attractiveTypeCode);
+        }
+
+        likeablePeopleStream = switch (sortCode) {
+            // 날짜순(오래전에 받은 호감표시를 우선적으로 표시)
+            case 2 ->
+                    likeablePeopleStream = likeablePeopleStream.sorted(Comparator.comparing(LikeablePerson::getId));
+
+            // 인기순(인기가 많은 사람의 호감표시를 우선적으로 표시)
+            case 3 ->
+                    likeablePeopleStream = likeablePeopleStream.sorted(Comparator.comparing(l -> ((LikeablePerson) l).getFromInstaMember().getLikes()).reversed());
+
+            // 인기순(인기가 적은 사람의 호감표시를 우선적으로 표시)
+            case 4 ->
+                    likeablePeopleStream = likeablePeopleStream.sorted(Comparator.comparing(l -> l.getFromInstaMember().getLikes()));
+
+            // 성별순(여성에게 받은 호감표시를 먼저 표시)
+            case 5 -> likeablePeopleStream
+                    .sorted(
+                            Comparator.comparing((LikeablePerson lp) -> lp.getFromInstaMember().getGender()).reversed()
+                                    .thenComparing(Comparator.comparing(LikeablePerson::getId).reversed())
+                    );
+
+            // 호감사유순(외모, 성격, 능력순으로 표시)
+            case 6 -> likeablePeopleStream
+                    .sorted(
+                            Comparator.comparing(LikeablePerson::getAttractiveTypeCode)
+                                    .thenComparing(Comparator.comparing(LikeablePerson::getId).reversed())
+                    );
+            default -> likeablePeopleStream;
+        };
+        return likeablePeopleStream.toList();
     }
 }
