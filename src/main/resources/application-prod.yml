@@ -1,23 +1,28 @@
+server:
+  shutdown: graceful
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
 spring:
+  data:
+    redis:
+      host: 172.17.0.1
+  lifecycle:
+    timeout-per-shutdown-phase: 1m
+  autoconfigure:
+    exclude:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://172.17.0.1:3306/gram_prod?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
     username: lldjlocal
     password: 1234
-  security:
-    oauth2:
-      client:
-        registration:
-          naver:
-            redirect-uri: '${custom.site.baseUrl}/{action}/oauth2/code/{registrationId}'
-          kakao:
-            redirect-uri: '${custom.site.baseUrl}/{action}/oauth2/code/{registrationId}'
-          google:
-            redirect-uri: '${custom.site.baseUrl}/{action}/oauth2/code/{registrationId}'
-          facebook:
-            redirect-uri: '${custom.site.baseUrl}/{action}/oauth2/code/{registrationId}'
-          instagram:
-            redirect-uri: '${custom.site.baseUrl}/{action}/oauth2/code/{registrationId}'
   jpa:
     hibernate:
       ddl-auto: update
